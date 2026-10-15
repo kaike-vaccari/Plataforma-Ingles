@@ -34,3 +34,23 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Arquivos de áudio e mídia
+*.mp3
+*.wav
+*.m4a
+*.mp4
+*.webm
+
+# Diretório temporário de processamento
+/tmp/
+
+# Dados e textos gerados das aulas específicas
+/data/estudos/*
+!/data/estudos/.gitkeep
+!/data/estudos/demo-peter-johnson/
+
+# Pastas e áudios recortados das aulas específicas
+/public/estudos/*
+!/public/estudos/.gitkeep
+!/public/estudos/demo-peter-johnson/
