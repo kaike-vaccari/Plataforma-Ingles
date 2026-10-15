@@ -213,7 +213,7 @@ export async function enriquecerSessaoComGemini(
     try {
       console.log(`Enriquecendo Sessão ${grupo.numeroDia} com Gemini AI...`);
       const genAI = new GoogleGenerativeAI(geminiApiKey);
-      const modelName = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+      const modelName = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
       const model = genAI.getGenerativeModel({
         model: modelName,
         generationConfig: {

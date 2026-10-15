@@ -1,11 +1,28 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, UploadCloud, Library } from 'lucide-react';
+import { BookOpen, UploadCloud, Library, CheckCircle2, AlertCircle } from 'lucide-react';
+
+interface StatusApi {
+  groq: { ok: boolean; mensagem: string };
+  gemini: { ok: boolean; mensagem: string; modelo?: string };
+  openai: { ok: boolean; mensagem: string };
+}
 
 export default function Navbar() {
   const pathname = usePathname();
+  const [status, setStatus] = useState<StatusApi | null>(null);
+
+  useEffect(() => {
+    fetch('/api/status')
+      .then((res) => res.json())
+      .then((data) => setStatus(data))
+      .catch(() => {});
+  }, []);
+
+  const apisOk = status?.groq.ok && status?.gemini.ok;
 
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
@@ -15,9 +32,33 @@ export default function Navbar() {
             <BookOpen className="w-5 h-5" />
           </div>
           <div>
-            <span className="font-bold text-lg text-slate-800 tracking-tight block leading-tight">
-              English Studio
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-lg text-slate-800 tracking-tight block leading-tight">
+                English Studio
+              </span>
+              {status && (
+                <div
+                  title={`Groq Whisper: ${status.groq.mensagem}\nGemini: ${status.gemini.mensagem}\nOpenAI: ${status.openai.mensagem}`}
+                  className={`hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full border transition cursor-help ${
+                    apisOk
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      : 'bg-amber-50 text-amber-700 border-amber-200'
+                  }`}
+                >
+                  {apisOk ? (
+                    <>
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      APIs Conectadas
+                    </>
+                  ) : (
+                    <>
+                      <AlertCircle className="w-3 h-3 text-amber-600" />
+                      Verificar APIs
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
             <span className="text-xs text-slate-500 font-medium">
               Método Textos com Áudio
             </span>
