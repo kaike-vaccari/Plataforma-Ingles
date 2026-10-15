@@ -46,28 +46,34 @@ export async function extrairAudio(inputPath: string, outputPath: string): Promi
 }
 
 /**
- * Recorta um trecho específico de áudio com precisão de milissegundos
+ * Recorta um trecho específico de áudio com precisão de milissegundos e
+ * margem sutil (padding) para não cortar a respiração inicial nem a última consoante/sílaba.
  */
 export async function recortarAudio(
   inputPath: string,
   outputPath: string,
   inicio: number,
-  fim: number
+  fim: number,
+  adicionarPadding = true
 ): Promise<string> {
   const dir = path.dirname(outputPath);
   await fs.mkdir(dir, { recursive: true });
 
-  const startSec = Math.max(0, inicio).toFixed(3);
-  const durationSec = Math.max(0.1, fim - inicio).toFixed(3);
+  // Margem de segurança de 120ms antes e 200ms depois para sons naturais
+  const padInicio = adicionarPadding ? 0.12 : 0;
+  const padFim = adicionarPadding ? 0.20 : 0;
 
-  // Colocando -ss e -t após -i garante decodificação precisa para clipes curtos
+  const startSec = Math.max(0, inicio - padInicio);
+  const durationSec = Math.max(0.3, (fim + padFim) - startSec);
+
   await execFileAsync('ffmpeg', [
     '-y',
+    '-ss', startSec.toFixed(3),
+    '-t', durationSec.toFixed(3),
     '-i', inputPath,
-    '-ss', startSec,
-    '-t', durationSec,
     '-acodec', 'libmp3lame',
     '-q:a', '2',
+    '-ar', '44100',
     outputPath
   ]);
 
@@ -76,8 +82,8 @@ export async function recortarAudio(
 
 /**
  * Executa o duplo corte físico do FFmpeg para todas as sessões e frases:
- * 1. audio-sessao.mp3 para cada minuto de estudo
- * 2. frase-[id].mp3 para cada frase curta de 1 a 5 segundos
+ * 1. audio-sessao.mp3 para cada minuto de estudo (sem padding exagerado)
+ * 2. frase-[id].mp3 para cada frase curta sincronizada com Whisper
  */
 export async function processarRecortesFisicos(
   audioPrincipalMp3: string,
@@ -96,17 +102,19 @@ export async function processarRecortesFisicos(
       audioPrincipalMp3,
       audioSessaoPath,
       sessao.inicio,
-      sessao.fim
+      sessao.fim,
+      false // Sem padding extra na sessão completa
     );
 
-    // 2. Recortes Físicos Individuais de cada frase da sessão
+    // 2. Recortes Físicos Individuais de cada frase da sessão (com padding suave)
     for (const bloco of sessao.blocosLinhaALinha) {
       const audioFrasePath = path.join(sessaoDir, `frase-${bloco.id}.mp3`);
       await recortarAudio(
         audioPrincipalMp3,
         audioFrasePath,
         bloco.inicio,
-        bloco.fim
+        bloco.fim,
+        true // Com padding para não cortar a fala
       );
     }
   }

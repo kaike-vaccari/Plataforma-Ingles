@@ -42,6 +42,11 @@ export async function POST(req: NextRequest) {
     // 1. Converte/extrai para MP3 limpo
     await extrairAudio(tempInputFilePath, tempPrincipalMp3Path);
 
+    // Salva cópia permanente do áudio master completo
+    const publicEstudoDir = path.join(process.cwd(), 'public', 'estudos', estudoId);
+    await fs.mkdir(publicEstudoDir, { recursive: true });
+    await fs.copyFile(tempPrincipalMp3Path, path.join(publicEstudoDir, 'audio-completo.mp3'));
+
     // 2. Obtém a duração total com precisão de milissegundos
     const duracaoTotal = await obterDuracao(tempPrincipalMp3Path);
     console.log(`[Upload] Duração detectada: ${duracaoTotal.toFixed(2)}s`);

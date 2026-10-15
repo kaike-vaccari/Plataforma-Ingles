@@ -1,0 +1,174 @@
+{
+  "id": "estudo_1792089625232_mz82m7",
+  "titulo": "The Pursuit Of HappYness   My favorite scene #1 - Take Flight Inc or Take Flight Org",
+  "criadoEm": "2026-10-15",
+  "duracaoTotal": 149,
+  "sessoes": [
+    {
+      "numeroDia": 1,
+      "concluido": false,
+      "inicio": 0,
+      "fim": 57,
+      "audioCompletoUrl": "/estudos/estudo_1792089625232_mz82m7/sessao-1/audio-sessao.mp3",
+      "textoInglesColuna": "Hi, Chris. Mr. Fromm, good to see you. Nice shirt. Thank you, sir. Chris. Hey, Jimmy. Chris. Chris. Sit down, please. I thought I'd, uh, wear a shirt today, um, you know, being the last day and all. Well, thank you. Thank you. We appreciate that. but um wear one tomorrow though okay because tomorrow's going to be your first day if you'd like to work here as a broker would you like that Chris yes sir good we couldn't be happier so welcome Was it as easy as it looked?",
+      "textoPortuguesColuna": "Oi, Chris. Sr. Fromm, bom te ver. Bela camisa. Obrigado, senhor. Chris. Ei, Jimmy. Chris. Chris. Sente-se, por favor. Eu pensei em, uh, usar uma camisa hoje, uh, sabe, sendo o último dia e tudo mais. Bem, obrigado. Obrigado. Nós agradecemos isso. Mas, uh, use uma amanhã, ok? Porque amanhã será seu primeiro dia se você quiser trabalhar aqui como corretor. Você gostaria disso, Chris? Sim, senhor. Bom. Não poderíamos estar mais felizes, então, bem-vindo. Foi tão fácil quanto parecia?",
+      "blocosLinhaALinha": [
+        {
+          "id": 1,
+          "inicio": 0,
+          "fim": 8.78,
+          "inglesHtml": "Hi, Chris. <span class=\"highlight\">Mr. Fromm</span>, <span class=\"highlight\">good to see you</span>. Nice shirt. Thank you, sir.",
+          "portuguesHtml": "Oi, Chris. <span class=\"highlight\">Sr. Fromm</span>, <span class=\"highlight\">bom te ver</span>. Bela camisa. Obrigado, senhor.",
+          "nota": "'Mr.' (Mister) é um título honorífico usado antes do sobrenome de um homem. 'Good to see you' é uma expressão comum para cumprimentar alguém que você não via há algum tempo ou para expressar satisfação em encontrar a pessoa.",
+          "audioFraseUrl": "/estudos/estudo_1792089625232_mz82m7/sessao-1/frase-1.mp3"
+        },
+        {
+          "id": 2,
+          "inicio": 8.84,
+          "fim": 14.14,
+          "inglesHtml": "Chris. Hey, Jimmy. Chris. Chris. <span class=\"highlight\">Sit down</span>, please.",
+          "portuguesHtml": "Chris. Ei, Jimmy. Chris. Chris. <span class=\"highlight\">Sente-se</span>, por favor.",
+          "nota": "'Sit down' é um phrasal verb que significa 'sentar-se'.",
+          "audioFraseUrl": "/estudos/estudo_1792089625232_mz82m7/sessao-1/frase-2.mp3"
+        },
+        {
+          "id": 3,
+          "inicio": 17.36,
+          "fim": 25.42,
+          "inglesHtml": "I <span class=\"highlight\">thought I'd</span>, uh, <span class=\"highlight\">wear a shirt</span> today, um, you know, <span class=\"highlight\">being the last day and all</span>. Well, thank you. Thank you.",
+          "portuguesHtml": "Eu <span class=\"highlight\">pensei em</span>, uh, <span class=\"highlight\">usar uma camisa</span> hoje, uh, sabe, <span class=\"highlight\">sendo o último dia e tudo mais</span>. Bem, obrigado. Obrigado.",
+          "nota": "'Thought I'd' é a contração de 'thought I would', significando 'pensei em' ou 'achei que deveria'. 'Wear a shirt' significa 'usar uma camisa'. 'Being the last day and all' é uma expressão informal que significa 'sendo o último dia e tudo mais', indicando que há outras razões implícitas.",
+          "audioFraseUrl": "/estudos/estudo_1792089625232_mz82m7/sessao-1/frase-3.mp3"
+        },
+        {
+          "id": 4,
+          "inicio": 25.46,
+          "fim": 32.08,
+          "inglesHtml": "We <span class=\"highlight\">appreciate that</span>. but um <span class=\"highlight\">wear one tomorrow though</span> okay",
+          "portuguesHtml": "Nós <span class=\"highlight\">agradecemos isso</span>. mas uh <span class=\"highlight\">use uma amanhã, ok?</span>",
+          "nota": "'Appreciate that' significa 'agradecer/valorizar isso'. 'Wear one tomorrow though' usa 'one' como pronome para evitar repetir 'shirt', e 'though' adiciona um contraste ou ressalva, como 'mas' ou 'no entanto'.",
+          "audioFraseUrl": "/estudos/estudo_1792089625232_mz82m7/sessao-1/frase-4.mp3"
+        },
+        {
+          "id": 5,
+          "inicio": 32.08,
+          "fim": 38.78,
+          "inglesHtml": "because tomorrow's <span class=\"highlight\">going to be</span> your <span class=\"highlight\">first day</span> <span class=\"highlight\">if you'd like to work here as a broker</span>",
+          "portuguesHtml": "porque amanhã <span class=\"highlight\">será</span> seu <span class=\"highlight\">primeiro dia</span> <span class=\"highlight\">se você quiser trabalhar aqui como corretor</span>",
+          "nota": "'Going to be' é uma forma comum de expressar o futuro, equivalente a 'será'. 'First day' significa 'primeiro dia'. 'If you'd like to work here as a broker' é uma condição, onde 'you'd like' é a contração de 'you would like', significando 'se você gostaria/quiser'.",
+          "audioFraseUrl": "/estudos/estudo_1792089625232_mz82m7/sessao-1/frase-5.mp3"
+        },
+        {
+          "id": 6,
+          "inicio": 38.78,
+          "fim": 46.38,
+          "inglesHtml": "<span class=\"highlight\">would you like that</span> Chris yes sir good",
+          "portuguesHtml": "<span class=\"highlight\">você gostaria disso</span> Chris sim senhor bom",
+          "nota": "'Would you like that?' é uma forma educada de perguntar se alguém deseja algo ou se aprova uma ideia.",
+          "audioFraseUrl": "/estudos/estudo_1792089625232_mz82m7/sessao-1/frase-6.mp3"
+        },
+        {
+          "id": 7,
+          "inicio": 46.38,
+          "fim": 52.44,
+          "inglesHtml": "we <span class=\"highlight\">couldn't be happier</span> so <span class=\"highlight\">welcome</span>",
+          "portuguesHtml": "nós <span class=\"highlight\">não poderíamos estar mais felizes</span> então <span class=\"highlight\">bem-vindo</span>",
+          "nota": "'Couldn't be happier' é uma expressão idiomática que significa 'estar extremamente feliz', o mais feliz possível. 'Welcome' é uma saudação para receber alguém.",
+          "audioFraseUrl": "/estudos/estudo_1792089625232_mz82m7/sessao-1/frase-7.mp3"
+        },
+        {
+          "id": 8,
+          "inicio": 52.44,
+          "fim": 57,
+          "inglesHtml": "<span class=\"highlight\">Was it as easy as it looked</span>?",
+          "portuguesHtml": "<span class=\"highlight\">Foi tão fácil quanto parecia</span>?",
+          "nota": "Esta é uma estrutura comparativa 'as...as...' (tão...quanto...), usada para comparar a igualdade entre duas coisas ou ações.",
+          "audioFraseUrl": "/estudos/estudo_1792089625232_mz82m7/sessao-1/frase-8.mp3"
+        }
+      ],
+      "focoDoTexto": [
+        "Expressões de cumprimento e cortesia: 'Good to see you', 'Thank you, sir', 'Sit down, please', 'Would you like that?', 'Welcome'.",
+        "Futuro com 'going to be': Uso de 'tomorrow's going to be' para expressar planos ou previsões futuras.",
+        "Condicionais e desejos com 'would': Uso de 'I'd' (I would) e 'if you'd like' (if you would like) para expressar pensamentos, desejos ou condições de forma educada.",
+        "Comparativos de igualdade 'as...as...': A estrutura 'as easy as it looked' para comparar a igualdade entre duas características ou ações."
+      ]
+    },
+    {
+      "numeroDia": 2,
+      "concluido": false,
+      "inicio": 57.48,
+      "fim": 112.09,
+      "audioCompletoUrl": "/estudos/estudo_1792089625232_mz82m7/sessao-2/audio-sessao.mp3",
+      "textoInglesColuna": "No, sir. No, sir, it wasn't. Good luck, Chris. Thank you. Thank you. Thank you sir Oh Chris I almost forgot Thank you. This part of my life, this little part, is called happiness.",
+      "textoPortuguesColuna": "Não, senhor. Não, senhor, não foi. Boa sorte, Chris. Obrigado. Obrigado. Obrigado, senhor. Ah, Chris, eu quase esqueci. Obrigado. Esta parte da minha vida, esta pequena parte, é chamada de felicidade.",
+      "blocosLinhaALinha": [
+        {
+          "id": 9,
+          "inicio": 57.48,
+          "fim": 64.92,
+          "inglesHtml": "<span class=\"highlight\">No, sir</span>. <span class=\"highlight\">No, sir</span>, <span class=\"highlight\">it wasn't</span>. <span class=\"highlight\">Good luck</span>, Chris. <span class=\"highlight\">Thank you</span>. Thank you.",
+          "portuguesHtml": "<span class=\"highlight\">Não, senhor</span>. <span class=\"highlight\">Não, senhor</span>, <span class=\"highlight\">não foi</span>. <span class=\"highlight\">Boa sorte</span>, Chris. <span class=\"highlight\">Obrigado</span>. Obrigado.",
+          "nota": "'No, sir' é uma forma educada e formal de negar ou discordar. 'It wasn't' é a forma negativa do passado simples do verbo 'to be' (ser/estar) para a terceira pessoa do singular. 'Good luck' é uma expressão comum para desejar sorte a alguém.",
+          "audioFraseUrl": "/estudos/estudo_1792089625232_mz82m7/sessao-2/frase-9.mp3"
+        },
+        {
+          "id": 10,
+          "inicio": 68.92,
+          "fim": 76.91,
+          "inglesHtml": "<span class=\"highlight\">Thank you sir</span> Oh Chris I <span class=\"highlight\">almost forgot</span>",
+          "portuguesHtml": "<span class=\"highlight\">Obrigado, senhor</span>. Ah, Chris, eu <span class=\"highlight\">quase esqueci</span>.",
+          "nota": "'Thank you sir' é uma forma educada de agradecer a um homem. A estrutura 'almost' + verbo no passado simples indica que algo esteve muito perto de acontecer, mas não aconteceu.",
+          "audioFraseUrl": "/estudos/estudo_1792089625232_mz82m7/sessao-2/frase-10.mp3"
+        },
+        {
+          "id": 11,
+          "inicio": 79.91,
+          "fim": 80.49,
+          "inglesHtml": "<span class=\"highlight\">Thank you</span>.",
+          "portuguesHtml": "<span class=\"highlight\">Obrigado</span>.",
+          "nota": null,
+          "audioFraseUrl": "/estudos/estudo_1792089625232_mz82m7/sessao-2/frase-11.mp3"
+        },
+        {
+          "id": 12,
+          "inicio": 99.45,
+          "fim": 112.09,
+          "inglesHtml": "<span class=\"highlight\">This part of my life</span>, this little part, <span class=\"highlight\">is called</span> <span class=\"highlight\">happiness</span>.",
+          "portuguesHtml": "<span class=\"highlight\">Esta parte da minha vida</span>, esta pequena parte, <span class=\"highlight\">é chamada de</span> <span class=\"highlight\">felicidade</span>.",
+          "nota": "'This part of my life' usa o pronome demonstrativo 'this' para se referir a algo próximo ou presente. 'Is called' é a voz passiva no presente simples, significando 'é chamado/a'. 'Happiness' é o substantivo para 'felicidade'.",
+          "audioFraseUrl": "/estudos/estudo_1792089625232_mz82m7/sessao-2/frase-12.mp3"
+        }
+      ],
+      "focoDoTexto": [
+        "Expressões de gratidão e despedida ('Thank you', 'Good luck').",
+        "Uso do passado simples do verbo 'to be' na negativa ('it wasn't').",
+        "A estrutura 'almost' + verbo no passado simples para indicar algo que quase aconteceu.",
+        "A voz passiva no presente simples ('is called')."
+      ]
+    },
+    {
+      "numeroDia": 3,
+      "concluido": false,
+      "inicio": 129.45,
+      "fim": 148.85,
+      "audioCompletoUrl": "/estudos/estudo_1792089625232_mz82m7/sessao-3/audio-sessao.mp3",
+      "textoInglesColuna": "Thank you.",
+      "textoPortuguesColuna": "Obrigado.",
+      "blocosLinhaALinha": [
+        {
+          "id": 13,
+          "inicio": 129.45,
+          "fim": 148.85,
+          "inglesHtml": "<span class=\"highlight\">Thank</span> you.",
+          "portuguesHtml": "<span class=\"highlight\">Obrigado</span>.",
+          "nota": "Expressão fundamental para demonstrar gratidão. 'Thank' é o verbo 'agradecer'. 'You' é o objeto direto do agradecimento.",
+          "audioFraseUrl": "/estudos/estudo_1792089625232_mz82m7/sessao-3/frase-13.mp3"
+        }
+      ],
+      "focoDoTexto": [
+        "Expressões de cortesia e gratidão.",
+        "Uso do verbo 'to thank' em sua forma mais comum."
+      ]
+    }
+  ]
+}

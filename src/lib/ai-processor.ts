@@ -1,7 +1,13 @@
 import fs from 'fs';
+import { File as NodeBufferFile } from 'node:buffer';
 import Groq from 'groq-sdk';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { SegmentoWhisper, SessaoEstudo, BlocoLinhaALinha } from '@/types/estudo';
+
+// Polyfill essencial para suporte a upload de arquivos em Node.js 18
+if (typeof globalThis.File === 'undefined') {
+  globalThis.File = NodeBufferFile as unknown as typeof File;
+}
 
 interface SegmentoBruto {
   id: number;
@@ -12,7 +18,7 @@ interface SegmentoBruto {
 
 /**
  * Transcreve o áudio obtendo timestamps precisos por segmento usando Whisper (Groq ou OpenAI)
- * com fallback inteligente para transcrição manual ou estimativa de sentenças.
+ * com fusão inteligente de sentenças e suporte a prompts de transcrição.
  */
 export async function transcreverAudio(
   audioPath: string,
@@ -32,20 +38,19 @@ export async function transcreverAudio(
         response_format: 'verbose_json',
         temperature: 0,
         language: 'en',
+        prompt: transcricaoManual ? transcricaoManual.substring(0, 1000) : undefined,
       })) as unknown as { segments?: SegmentoBruto[]; text?: string };
 
       if (transcription.segments && transcription.segments.length > 0) {
-        return transcription.segments.map((seg, idx) => ({
-          id: idx + 1,
-          start: Math.round(seg.start * 100) / 100,
-          end: Math.round(seg.end * 100) / 100,
-          text: seg.text.trim(),
-        }));
+        console.log(`Whisper retornou ${transcription.segments.length} fragmentos. Agrupando em sentenças coerentes...`);
+        return unirSegmentosEmSentencas(transcription.segments);
       }
     } catch (err) {
       console.error('Falha na chamada ao Groq Whisper:', err);
     }
-  } else if (openAiApiKey) {
+  }
+
+  if (openAiApiKey) {
     try {
       console.log('Transcrevendo via OpenAI Whisper API...');
       const formData = new FormData();
@@ -58,6 +63,9 @@ export async function transcreverAudio(
       formData.append('model', 'whisper-1');
       formData.append('response_format', 'verbose_json');
       formData.append('language', 'en');
+      if (transcricaoManual) {
+        formData.append('prompt', transcricaoManual.substring(0, 1000));
+      }
 
       const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
         method: 'POST',
@@ -70,12 +78,7 @@ export async function transcreverAudio(
       if (response.ok) {
         const data = (await response.json()) as { segments?: SegmentoBruto[] };
         if (data.segments && data.segments.length > 0) {
-          return data.segments.map((seg, idx) => ({
-            id: idx + 1,
-            start: Math.round(seg.start * 100) / 100,
-            end: Math.round(seg.end * 100) / 100,
-            text: seg.text.trim(),
-          }));
+          return unirSegmentosEmSentencas(data.segments);
         }
       }
     } catch (err) {
@@ -83,13 +86,100 @@ export async function transcreverAudio(
     }
   }
 
-  // Fallback: Se o usuário forneceu transcrição manual ou para testes locais sem chave de API
-  console.log('Utilizando gerador/alinhador de sentenças baseado no texto fornecido ou padrão...');
+  // Fallback didático caso nenhuma API esteja acessível
+  console.log('Utilizando alinhador didático protegido contra quebra de abreviações...');
   return gerarSegmentosFallback(transcricaoManual, duracaoTotal);
 }
 
 /**
- * Heurística de fallback para quebrar texto em sentenças e calcular timestamps proporcionais
+ * Une segmentos brutos do Whisper para formar frases completas com sentido pedagógico real.
+ * Evita recortes de palavras isoladas (ex: apenas "Mr." ou apenas "So...").
+ */
+export function unirSegmentosEmSentencas(rawSegments: SegmentoBruto[]): SegmentoWhisper[] {
+  const merged: { start: number; end: number; text: string }[] = [];
+  let current: { start: number; end: number; text: string } | null = null;
+
+  for (let i = 0; i < rawSegments.length; i++) {
+    const seg = rawSegments[i];
+    // Remove etiquetas de personagens como "Chris Gardner: " se estiverem soltas
+    const cleanText = seg.text
+      .replace(/^([A-Za-z0-9\s]+):\s*/, '')
+      .trim();
+
+    if (!cleanText || cleanText === '.' || cleanText === '...' || cleanText === ',') {
+      continue;
+    }
+
+    if (!current) {
+      current = {
+        start: seg.start,
+        end: seg.end,
+        text: cleanText,
+      };
+      continue;
+    }
+
+    const duracaoAtual = current.end - current.start;
+    const duracaoEsteSegmento = seg.end - seg.start;
+    const terminaComPontuacao = /[.!?]$/.test(current.text);
+    const terminaComAbreviacao = /\b(Mr|Mrs|Ms|Dr|Prof|Sr|Jr|St|vs)\.$/i.test(current.text);
+
+    // Conectivos comuns que indicam continuação da frase
+    const proximoEConectivo = /^(and|but|or|because|so|if|though|um|uh|you know|as|to|that)\b/i.test(cleanText);
+
+    // Deve unir se:
+    // 1. Termina com abreviação (ex: "Mr." NUNCA pode ser ponto final)
+    // 2. Não terminou com pontuação (.!?)
+    // 3. A frase atual é muito curta (< 2.0s ou menos de 3 palavras)
+    // 4. O próximo segmento é muito curto (< 1.5s) ou é um conectivo direto
+    // Limite máximo: uma frase linha a linha não deve ultrapassar 8.5 segundos
+    const podeUnir = (duracaoAtual + duracaoEsteSegmento) <= 8.5;
+    const deveUnir =
+      terminaComAbreviacao ||
+      !terminaComPontuacao ||
+      duracaoAtual < 2.0 ||
+      duracaoEsteSegmento < 1.4 ||
+      proximoEConectivo;
+
+    if (podeUnir && deveUnir) {
+      current.end = seg.end;
+      current.text = `${current.text} ${cleanText}`.trim();
+    } else {
+      merged.push(current);
+      current = {
+        start: seg.start,
+        end: seg.end,
+        text: cleanText,
+      };
+    }
+  }
+
+  if (current) {
+    merged.push(current);
+  }
+
+  // Se houver alguma frase final muito minúscula (ex: < 1.0s como "Uh..."), funde com a anterior
+  if (merged.length > 1) {
+    const ultima = merged[merged.length - 1];
+    if (ultima.end - ultima.start < 1.2 || /^(uh|um|so)\b/i.test(ultima.text)) {
+      const penultima = merged[merged.length - 2];
+      penultima.end = ultima.end;
+      penultima.text = `${penultima.text} ${ultima.text}`.trim();
+      merged.pop();
+    }
+  }
+
+  return merged.map((m, idx) => ({
+    id: idx + 1,
+    start: Math.round(m.start * 100) / 100,
+    end: Math.round(m.end * 100) / 100,
+    text: m.text,
+  }));
+}
+
+/**
+ * Divisor inteligente de texto para fallback caso o áudio falhe,
+ * PROTEGENDO expressamente abreviações como Mr., Mrs., Dr., etc.
  */
 function gerarSegmentosFallback(texto?: string, duracaoTotal = 60): SegmentoWhisper[] {
   const textoPadrao =
@@ -97,21 +187,64 @@ function gerarSegmentosFallback(texto?: string, duracaoTotal = 60): SegmentoWhis
       ? texto
       : 'Hello everyone and welcome to this English lesson. Today we are going to learn how to study English effectively with audio and texts. It is one of the most powerful methods to improve your listening and vocabulary naturally. Every day, practice for a few minutes and you will see remarkable progress in no time. Consistency is the real secret to fluency.';
 
-  // Divide por pontuações de final de frase
-  const frases = textoPadrao
+  // 1. Remove rótulos de falantes "Nome: "
+  let processado = textoPadrao.replace(/^([A-Za-z0-9\s]+):\s*/gm, '');
+
+  // 2. Protege abreviações comuns para que o ponto não quebre a frase
+  const abreviacoes = [
+    { regex: /\bMr\./gi, token: '__ABBR_MR__' },
+    { regex: /\bMrs\./gi, token: '__ABBR_MRS__' },
+    { regex: /\bMs\./gi, token: '__ABBR_MS__' },
+    { regex: /\bDr\./gi, token: '__ABBR_DR__' },
+    { regex: /\bProf\./gi, token: '__ABBR_PROF__' },
+    { regex: /\bSr\./gi, token: '__ABBR_SR__' },
+    { regex: /\bJr\./gi, token: '__ABBR_JR__' },
+    { regex: /\bU\.S\./gi, token: '__ABBR_US__' },
+    { regex: /\bSt\./gi, token: '__ABBR_ST__' },
+    { regex: /\be\.g\./gi, token: '__ABBR_EG__' },
+    { regex: /\bi\.e\./gi, token: '__ABBR_IE__' },
+  ];
+
+  for (const { regex, token } of abreviacoes) {
+    processado = processado.replace(regex, token);
+  }
+
+  // 3. Divide respeitando fim de frase verdadeiro (. ? !)
+  const frasesBrutas = processado
     .split(/(?<=[.?!])\s+/)
     .map((f) => f.trim())
     .filter((f) => f.length > 0);
 
-  const duracao = duracaoTotal > 0 ? duracaoTotal : Math.max(30, frases.length * 4);
-  const duracaoPorFrase = duracao / Math.max(1, frases.length);
+  // 4. Restaura abreviações
+  const frases = frasesBrutas.map((f) => {
+    let restaurado = f;
+    restaurado = restaurado.replace(/__ABBR_MR__/g, 'Mr.');
+    restaurado = restaurado.replace(/__ABBR_MRS__/g, 'Mrs.');
+    restaurado = restaurado.replace(/__ABBR_MS__/g, 'Ms.');
+    restaurado = restaurado.replace(/__ABBR_DR__/g, 'Dr.');
+    restaurado = restaurado.replace(/__ABBR_PROF__/g, 'Prof.');
+    restaurado = restaurado.replace(/__ABBR_SR__/g, 'Sr.');
+    restaurado = restaurado.replace(/__ABBR_JR__/g, 'Jr.');
+    restaurado = restaurado.replace(/__ABBR_US__/g, 'U.S.');
+    restaurado = restaurado.replace(/__ABBR_ST__/g, 'St.');
+    restaurado = restaurado.replace(/__ABBR_EG__/g, 'e.g.');
+    restaurado = restaurado.replace(/__ABBR_IE__/g, 'i.e.');
+    return restaurado;
+  });
 
+  const totalPalavras = frases.reduce((acc, f) => acc + f.split(/\s+/).length, 0);
+  const duracao = duracaoTotal > 0 ? duracaoTotal : Math.max(30, totalPalavras * 0.4);
+
+  let acumulado = 0;
   return frases.map((frase, idx) => {
-    const start = Math.round(idx * duracaoPorFrase * 10) / 10;
-    const end = Math.min(
-      Math.round((idx + 1) * duracaoPorFrase * 10) / 10,
-      duracao
-    );
+    const palavrasFrase = frase.split(/\s+/).length;
+    const proporcao = Math.max(0.05, palavrasFrase / Math.max(1, totalPalavras));
+    const duracaoDestaFrase = Math.max(1.5, proporcao * duracao);
+
+    const start = Math.round(acumulado * 10) / 10;
+    const end = Math.min(Math.round((acumulado + duracaoDestaFrase) * 10) / 10, duracao);
+    acumulado += duracaoDestaFrase;
+
     return {
       id: idx + 1,
       start,
@@ -131,8 +264,6 @@ export interface GrupoSessaoBruta {
 /**
  * REGRA CRÍTICA DE NEGÓCIO:
  * Agrupa os segmentos em sessões diárias de no máximo 60 segundos SEM cortar frases ao meio.
- * Uma sessão acumula segmentos enquanto (segmento.end - sessao.inicio) <= 60.
- * Ao ultrapassar 60s, fecha a sessão anterior no fim da frase anterior e inicia nova sessão.
  */
 export function agruparSegmentosEmSessoes(
   segmentos: SegmentoWhisper[]
@@ -147,12 +278,9 @@ export function agruparSegmentosEmSessoes(
 
   for (let i = 0; i < segmentos.length; i++) {
     const seg = segmentos[i];
-
-    // Se já temos segmentos acumulados e este segmento fará o bloco exceder 60s:
     const duracaoAcumuladaComEste = seg.end - sessaoInicio;
 
     if (duracaoAcumuladaComEste > 60 && segmentosNaSessao.length > 0) {
-      // Fecha a sessão atual
       const ultimoSeg = segmentosNaSessao[segmentosNaSessao.length - 1];
       sessoes.push({
         numeroDia: diaAtual,
@@ -161,7 +289,6 @@ export function agruparSegmentosEmSessoes(
         segmentos: [...segmentosNaSessao],
       });
 
-      // Inicia a próxima sessão a partir deste segmento
       diaAtual++;
       sessaoInicio = seg.start;
       segmentosNaSessao = [seg];
@@ -170,7 +297,6 @@ export function agruparSegmentosEmSessoes(
     }
   }
 
-  // Adiciona a última sessão remanescente
   if (segmentosNaSessao.length > 0) {
     const ultimoSeg = segmentosNaSessao[segmentosNaSessao.length - 1];
     sessoes.push({
@@ -213,7 +339,7 @@ export async function enriquecerSessaoComGemini(
     try {
       console.log(`Enriquecendo Sessão ${grupo.numeroDia} com Gemini AI...`);
       const genAI = new GoogleGenerativeAI(geminiApiKey);
-      const modelName = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+      const modelName = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
       const model = genAI.getGenerativeModel({
         model: modelName,
         generationConfig: {
@@ -234,8 +360,8 @@ ${JSON.stringify(
 Tarefas obrigatórias:
 1. Gere o texto corrido completo em inglês ("textoInglesColuna") unindo as frases de forma natural.
 2. Gere a tradução corrida completa em português brasileiro natural ("textoPortuguesColuna").
-3. Para CADA bloco de frase (respeitando o mesmo "id", "inicio" e "fim"), gere:
-   - "inglesHtml": Frase original em inglês aplicando a tag <span class="highlight">TERMO</span> nos termos-chave, verbos essenciais, phrasal verbs ou expressões importantes.
+3. Para CADA bloco de frase (respeitando o mesmo "id"), gere:
+   - "inglesHtml": Frase original em inglês aplicando a tag <span class="highlight">TERMO</span> nos termos-chave, verbos essenciais, phrasal verbs ou expressões importantes. NÃO separe títulos honoríficos como Mr., Mrs., Dr. do nome que os acompanha.
    - "portuguesHtml": Tradução correspondente em português aplicando a mesma tag <span class="highlight">TERMO EQUIVALENTE</span> exatamente no termo correspondente ao grifado em inglês.
    - "nota": Uma breve explicação gramatical ou de vocabulário esclarecendo o sentido da expressão grifada ou nuances de uso (ou null se for muito simples).
 4. Em "focoDoTexto", forneça uma lista com 2 a 4 pontos resumindo estruturas, tempos verbais ou vocabulário que o aluno deve dominar nesta sessão de 1 minuto.
@@ -296,9 +422,6 @@ Devolva ESTRITAMENTE o formato JSON conforme esta interface:
   return gerarSessaoFallback(grupo, estudoId);
 }
 
-/**
- * Fallback heurístico para construir a sessão caso a API externa não responda
- */
 function gerarSessaoFallback(grupo: GrupoSessaoBruta, estudoId: string): SessaoEstudo {
   const blocosLinhaALinha: BlocoLinhaALinha[] = grupo.segmentos.map((seg) => {
     const palavras = seg.text.split(' ');
